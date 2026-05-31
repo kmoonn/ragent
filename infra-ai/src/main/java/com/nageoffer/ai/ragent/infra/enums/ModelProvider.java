@@ -29,11 +29,6 @@ import lombok.RequiredArgsConstructor;
 public enum ModelProvider {
 
     /**
-     * Ollama 本地模型服务
-     */
-    OLLAMA("ollama"),
-
-    /**
      * 阿里云百炼大模型平台
      */
     BAI_LIAN("bailian"),
@@ -42,11 +37,6 @@ public enum ModelProvider {
      * 硅基流动 AI 模型服务
      */
     SILICON_FLOW("siliconflow"),
-
-    /**
-     * 推理时代 AI 模型服务
-     */
-    AI_HUB_MIX("aihubmix"),
 
     /**
      * 空实现，用于测试或占位
