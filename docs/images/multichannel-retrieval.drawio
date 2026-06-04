@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="30.0.4">
+  <diagram name="MultiChannelRetrievalEngine">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Main Container -->
+        <mxCell id="main" value="MultiChannelRetrievalEngine" style="swimlane;startSize=40;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="720" height="520" as="geometry"/>
+        </mxCell>
+
+        <!-- Phase 1 Container -->
+        <mxCell id="phase1" value="阶段1: 多通道并行检索" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="20" y="60" width="680" height="280" as="geometry"/>
+        </mxCell>
+
+        <!-- SearchContext -->
+        <mxCell id="ctx" value="SearchContext" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="phase1">
+          <mxGeometry x="30" y="50" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- isEnabled decision -->
+        <mxCell id="enabled" value="isEnabled()?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="phase1">
+          <mxGeometry x="180" y="40" width="100" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- search method -->
+        <mxCell id="search" value="search()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="phase1">
+          <mxGeometry x="310" y="50" width="100" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Result -->
+        <mxCell id="result" value="SearchChannelResult" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="phase1">
+          <mxGeometry x="440" y="50" width="130" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Channel 1: IntentDirected -->
+        <mxCell id="ch1" value="IntentDirected&#xa;SearchChannel&#xa;(priority=1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="phase1">
+          <mxGeometry x="100" y="150" width="140" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Channel 2: VectorGlobal -->
+        <mxCell id="ch2" value="VectorGlobal&#xa;SearchChannel&#xa;(priority=10)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;" vertex="1" parent="phase1">
+          <mxGeometry x="280" y="150" width="140" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Channel 3: Extensible -->
+        <mxCell id="ch3" value="(可扩展...)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=1;" vertex="1" parent="phase1">
+          <mxGeometry x="460" y="150" width="120" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Parallel execution -->
+        <mxCell id="parallel" value="CompletableFuture 并行执行" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="phase1">
+          <mxGeometry x="200" y="240" width="280" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Phase 2 Container -->
+        <mxCell id="phase2" value="阶段2: 后置处理器链" style="swimlane;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="20" y="360" width="680" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- Chunks input -->
+        <mxCell id="chunks" value="chunks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="phase2">
+          <mxGeometry x="30" y="50" width="80" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Deduplication -->
+        <mxCell id="dedup" value="Deduplication&#xa;PostProcessor&#xa;(order=1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="phase2">
+          <mxGeometry x="150" y="40" width="130" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Rerank -->
+        <mxCell id="rerank" value="Rerank&#xa;PostProcessor&#xa;(order=2)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="phase2">
+          <mxGeometry x="320" y="40" width="130" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Final Result -->
+        <mxCell id="final" value="List&lt;RetrievedChunk&gt;&#xa;(最终结果)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="phase2">
+          <mxGeometry x="490" y="40" width="140" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="phase1" source="ctx" target="enabled">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="phase1" source="enabled" target="search">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="phase1" source="search" target="result">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="phase1" source="enabled" target="ch1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="phase1" source="enabled" target="ch2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="phase1" source="enabled" target="ch3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Phase 2 edges -->
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="phase2" source="chunks" target="dedup">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="phase2" source="dedup" target="rerank">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="phase2" source="rerank" target="final">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

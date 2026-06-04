@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="30.0.4">
+  <diagram name="ModelRouting">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Main Container -->
+        <mxCell id="main" value="Routing Service Layer" style="swimlane;startSize=40;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="640" height="500" as="geometry"/>
+        </mxCell>
+
+        <!-- Routing Services Row -->
+        <mxCell id="svc1" value="RoutingLLMService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="40" y="60" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc2" value="RoutingEmbeddingService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="240" y="60" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="svc3" value="RoutingRerankService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="440" y="60" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ModelRoutingExecutor Container -->
+        <mxCell id="executor" value="ModelRoutingExecutor" style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="40" y="140" width="560" height="170" as="geometry"/>
+        </mxCell>
+
+        <!-- Loop content -->
+        <mxCell id="loop" value="for each target in candidates:" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="executor">
+          <mxGeometry x="20" y="40" width="180" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Check health -->
+        <mxCell id="check" value="healthStore.allowCall()?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="executor">
+          <mxGeometry x="220" y="35" width="130" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Skip -->
+        <mxCell id="skip" value="skip" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="executor">
+          <mxGeometry x="370" y="45" width="60" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Try call -->
+        <mxCell id="try" value="try:&#xa;caller.call()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="executor">
+          <mxGeometry x="20" y="90" width="100" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Success -->
+        <mxCell id="success" value="markSuccess()&#xa;return result" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="executor">
+          <mxGeometry x="140" y="90" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Failure -->
+        <mxCell id="fail" value="catch:&#xa;markFailure()&#xa;continue" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="executor">
+          <mxGeometry x="280" y="90" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Fallback -->
+        <mxCell id="fallback" value="// fallback to next" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=1;" vertex="1" parent="executor">
+          <mxGeometry x="420" y="90" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ModelHealthStore Container -->
+        <mxCell id="health" value="ModelHealthStore (断路器状态管理)" style="swimlane;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="40" y="330" width="560" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- CLOSED state -->
+        <mxCell id="closed" value="CLOSED&#xa;(正常)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="health">
+          <mxGeometry x="40" y="50" width="100" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- OPEN state -->
+        <mxCell id="open" value="OPEN&#xa;(熔断)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="health">
+          <mxGeometry x="320" y="50" width="100" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- HALF_OPEN state -->
+        <mxCell id="half" value="HALF_OPEN&#xa;(试探)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="health">
+          <mxGeometry x="180" y="50" width="100" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges in health store -->
+        <mxCell id="h1" value="failures >= threshold" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#b85450;" edge="1" parent="health" source="closed" target="open">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="h2" value="after openDuration" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d6b656;" edge="1" parent="health" source="open" target="half">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="h3" value="success" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="health" source="half" target="closed">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Main edges -->
+        <mxCell id="m1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="main" source="svc1" target="executor">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="m2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="main" source="svc2" target="executor">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="m3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="main" source="svc3" target="executor">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="m4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="main" source="executor" target="health">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Executor edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="executor" source="loop" target="check">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="false" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="executor" source="check" target="skip">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="true" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="executor" source="check" target="try">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

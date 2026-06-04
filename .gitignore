@@ -42,3 +42,5 @@ node_modules/
 dist/
 .vite/
 .env.local
+.ttadk/
+specs/doc_export/

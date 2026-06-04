@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="30.0.4">
+  <diagram name="FairDistributedRateLimiter">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="900">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Main Container -->
+        <mxCell id="main" value="FairDistributedRateLimiter" style="swimlane;startSize=40;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="640" height="600" as="geometry"/>
+        </mxCell>
+
+        <!-- Request Flow Container -->
+        <mxCell id="flow" value="请求入队流程" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="20" y="60" width="600" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- acquire -->
+        <mxCell id="acquire" value="acquire(AcquireRequest)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="flow">
+          <mxGeometry x="40" y="50" width="160" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Steps -->
+        <mxCell id="s1" value="创建 Ticket&#xa;(状态机: PENDING)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="flow">
+          <mxGeometry x="230" y="40" width="130" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="s2" value="setEntryMarker&#xa;(requestId, TTL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="flow">
+          <mxGeometry x="380" y="40" width="130" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="s3" value="ZADD queue&#xa;score requestId" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="flow">
+          <mxGeometry x="230" y="110" width="130" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="s4" value="tryAcquireIfReady()&#xa;Lua 原子操作" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="flow">
+          <mxGeometry x="380" y="110" width="130" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="s5" value="scheduleQueuePoll()&#xa;定时轮询" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="flow">
+          <mxGeometry x="230" y="170" width="180" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Redis Container -->
+        <mxCell id="redis" value="Redis 数据结构" style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="20" y="300" width="600" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r1" value="semaphore&#xa;PermitExpirableSemaphore" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="redis">
+          <mxGeometry x="30" y="45" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2" value="queue&#xa;ZSet (排队队列)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="redis">
+          <mxGeometry x="180" y="45" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="r3" value="queue:seq&#xa;AtomicLong" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="redis">
+          <mxGeometry x="310" y="45" width="110" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="r4" value="entry:{id}&#xa;Bucket with TTL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="redis">
+          <mxGeometry x="430" y="45" width="130" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Ticket State Machine -->
+        <mxCell id="state" value="Ticket 状态机" style="swimlane;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="20" y="450" width="600" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pending" value="PENDING&#xa;(初始)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="state">
+          <mxGeometry x="40" y="50" width="90" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="granted" value="GRANTED&#xa;(获取)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="state">
+          <mxGeometry x="170" y="50" width="90" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="timeout" value="TIMED_OUT&#xa;(超时)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="state">
+          <mxGeometry x="300" y="50" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="cancelled" value="CANCELLED&#xa;(取消)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;" vertex="1" parent="state">
+          <mxGeometry x="440" y="50" width="100" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Flow edges -->
+        <mxCell id="f1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="flow" source="acquire" target="s1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="f2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="flow" source="s1" target="s2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="f3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="flow" source="s2" target="s3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="f4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="flow" source="s3" target="s4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="f5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="flow" source="s4" target="s5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- State edges -->
+        <mxCell id="st1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;" edge="1" parent="state" source="pending" target="granted">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="st2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#b85450;" edge="1" parent="state" source="pending" target="timeout">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="st3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;" edge="1" parent="state" source="pending" target="cancelled">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Main edges -->
+        <mxCell id="m1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="main" source="flow" target="redis">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="m2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="main" source="redis" target="state">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

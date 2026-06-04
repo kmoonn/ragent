@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="30.0.4">
+  <diagram name="RagTrace">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="900">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Main Container -->
+        <mxCell id="main" value="RAG Trace System" style="swimlane;startSize=40;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="640" height="580" as="geometry"/>
+        </mxCell>
+
+        <!-- RagTraceAspect Container -->
+        <mxCell id="aspect" value="RagTraceAspect (AOP 切面)" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="20" y="60" width="600" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- @RagTraceRoot -->
+        <mxCell id="root" value="@RagTraceRoot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="aspect">
+          <mxGeometry x="40" y="50" width="130" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="rootFlow" value="aroundRoot():&#xa;- 创建 traceId&#xa;- 记录 Run 开始&#xa;- 设置 TTL 上下文&#xa;- 执行业务逻辑&#xa;- 记录 Run 结束" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="aspect">
+          <mxGeometry x="40" y="100" width="180" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- @RagTraceNode -->
+        <mxCell id="node" value="@RagTraceNode" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="aspect">
+          <mxGeometry x="350" y="50" width="130" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="nodeFlow" value="aroundNode():&#xa;- 获取 traceId&#xa;- 记录 Node 开始&#xa;- push 节点栈&#xa;- 执行业务逻辑&#xa;- 记录 Node 结束" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="aspect">
+          <mxGeometry x="350" y="100" width="180" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- RagTraceContext Container -->
+        <mxCell id="ctx" value="RagTraceContext (TTL 上下文)" style="swimlane;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="20" y="280" width="600" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- TTL fields -->
+        <mxCell id="ttl1" value="TransmittableThreadLocal&lt;String&gt;&#xa;TRACE_ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="ctx">
+          <mxGeometry x="30" y="45" width="170" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ttl2" value="TransmittableThreadLocal&lt;String&gt;&#xa;TASK_ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="ctx">
+          <mxGeometry x="220" y="45" width="170" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ttl3" value="TransmittableThreadLocal&lt;Deque&gt;&#xa;NODE_STACK (深拷贝)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="ctx">
+          <mxGeometry x="410" y="45" width="170" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- RagTraceRecordService Container -->
+        <mxCell id="record" value="RagTraceRecordService (异步写入数据库)" style="swimlane;startSize=30;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="main">
+          <mxGeometry x="20" y="420" width="600" height="140" as="geometry"/>
+        </mxCell>
+
+        <!-- Methods -->
+        <mxCell id="m1" value="startRun(RagTraceRunDO)&#xa;→ 写入 rag_trace_run 表" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=10;" vertex="1" parent="record">
+          <mxGeometry x="30" y="45" width="180" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="m2" value="finishRun(traceId, ...)&#xa;→ 更新状态、耗时、错误" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=10;" vertex="1" parent="record">
+          <mxGeometry x="220" y="45" width="180" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="m3" value="startNode / finishNode&#xa;→ 写入 rag_trace_node 表" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=10;" vertex="1" parent="record">
+          <mxGeometry x="410" y="45" width="170" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" edge="1" parent="aspect" source="root" target="rootFlow">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" edge="1" parent="aspect" source="node" target="nodeFlow">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="设置/获取" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="main" source="aspect" target="ctx">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" value="记录" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="main" source="ctx" target="record">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
